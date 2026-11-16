@@ -1,0 +1,56 @@
+{
+  // Copy this to `wrangler.jsonc` and fill in your own values. The real file is gitignored,
+  // because it holds the IDs of your Cloudflare account, your database and your sign-in policy.
+  // Nothing here is a secret — secrets are set separately, see the bottom of this file — but
+  // these are yours, and a fork of this repo should never deploy to your account.
+  //
+  // SETUP.md walks through where each value comes from.
+
+  "name": "app",
+  // `npm run cf -- whoami` prints this.
+  "account_id": "<your-cloudflare-account-id>",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {"enabled": true},
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-check-in",
+      // `npm run cf -- d1 create daily-check-in` prints this.
+      "database_id": "<your-d1-database-id>",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "vars": {
+    // Cloudflare Access (Zero Trust). Both values come from the Access application you create
+    // in step 4 of SETUP.md. Until they are set, the Worker refuses every request: it fails
+    // closed on purpose, so a half-finished deploy is never an open one.
+    "ACCESS_TEAM_DOMAIN": "<your-team>.cloudflareaccess.com",
+    "ACCESS_AUD": "<your-access-application-audience-tag>",
+
+    // Who lives here: comma-separated, always allowed, checked again by the Worker behind
+    // Access. The owner can invite more people from Settings → People; those invites live in
+    // D1 and the app keeps the Access policy in step with both lists.
+    "ALLOWED_EMAILS": "you@example.com",
+    // The one account that can invite and remove people.
+    "OWNER_EMAIL": "you@example.com",
+
+    // Needed only for the invite feature, so the Worker can rewrite the Access policy.
+    "CF_ACCOUNT_ID": "<your-cloudflare-account-id>",
+    "ACCESS_APP_ID": "<your-access-application-id>",
+    "ACCESS_POLICY_ID": "<your-access-policy-id>",
+
+    // Claude estimates per person per day, counted across photos, typed meals and workouts.
+    // This is your cost ceiling: at roughly 1–3¢ an estimate, 60 is about $1.20 a day at most.
+    "PHOTO_DAILY_LIMIT": "60"
+  }
+
+  // Secrets never go in this file, or in any file in this folder. Set them with:
+  //   npm run cf -- secret put ANTHROPIC_API_KEY    (required for meal and workout estimates)
+  //   npm run cf -- secret put ACCESS_ADMIN_TOKEN   (optional, only for Settings → People)
+  // They are encrypted by Cloudflare and readable only by the Worker at runtime. The browser
+  // never sees them.
+}

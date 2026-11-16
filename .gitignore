@@ -1,0 +1,9 @@
+/dist/
+/node_modules/
+/.wrangler/
+/.wrangler-home/
+/.dev.vars
+/worker/assets.mjs
+/.claude/
+/wrangler.jsonc
+/.openai/

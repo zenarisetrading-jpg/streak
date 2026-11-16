@@ -1,0 +1,20 @@
+{
+  "name": "daily-check-in",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "cf": "XDG_CONFIG_HOME=\"$PWD/.wrangler-home\" wrangler",
+    "dev": "npm run build && npm run cf -- d1 migrations apply DB --local && npm run cf -- dev",
+    "deploy": "npm run build && npm run cf -- d1 migrations apply DB --remote && npm run cf -- deploy",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "cfapi": "XDG_CONFIG_HOME=\"$PWD/.wrangler-home\" cf --profile personal"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.7.0"
+  },
+  "devDependencies": {
+    "cf": "^0.15.0",
+    "wrangler": "^4.159.0"
+  }
+}

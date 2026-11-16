@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Streak">
+<meta name="theme-color" content="#F4F4F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111114" media="(prefers-color-scheme: dark)">
+<meta name="app-version" content="__APP_VERSION__">
+<link rel="manifest" href="/app.webmanifest"><link rel="apple-touch-icon" href="/icon.png"><link rel="icon" type="image/png" href="/favicon.png">
+<title>Streak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="/design/tokens.css">
+<style>
+/* Screen layouts built from the design system's components (see DESIGN.md). */
+[hidden]{display:none !important}
+/* While setup is up it is the only thing on screen: nothing behind it scrolls. */
+body.is-setup{overflow:hidden}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3)}
+/* Sticky top bar shared by every screen. It slims down once the page scrolls; the day strip
+   only shows where the selected date matters (Today, Log, Workouts). */
+html{scroll-padding-top:calc(var(--topbar-h,0px) + var(--space-3))}
+.topbar{position:sticky;top:0;z-index:20;margin:calc(var(--space-4) * -1) calc(var(--gutter) * -1) var(--space-2);padding:calc(var(--space-3) + env(safe-area-inset-top)) var(--gutter) var(--space-1);background:var(--color-bg);transition:box-shadow var(--duration-base) var(--ease-out)}
+.topbar .home-header{margin:0 0 var(--space-3)}
+.topbar .date-strip-wrap{margin:0}
+.topbar[data-screen="analytics"] .date-strip-wrap,.topbar[data-screen="settings"] .date-strip-wrap{display:none}
+.topbar.is-compact{box-shadow:var(--shadow-md)}
+.topbar.is-compact .home-header{margin-bottom:var(--space-2)}
+.topbar.is-compact .home-header__sub{display:none}
+.topbar.is-compact .avatar--lg{inline-size:36px;block-size:36px}
+.topbar.is-compact .home-header__hi{font-size:var(--text-lg)}
+.topbar.is-compact .date-chip{block-size:48px;min-inline-size:46px;gap:1px}
+.topbar.is-compact .date-chip strong{font-size:var(--text-md)}
+.screen-title{margin:var(--space-3) 0 var(--space-4);font-size:var(--text-xl);font-weight:var(--weight-black);line-height:var(--leading-tight)}
+/* Today header: greeting beside the portrait, and a strip of day pills for picking the date. */
+.home-header{display:flex;align-items:center;gap:var(--space-3);margin:var(--space-2) 0 var(--space-4)}
+.avatar--lg{inline-size:56px;block-size:56px;flex:none}
+.home-header__hi{margin:0;font-size:var(--text-xl);font-weight:var(--weight-black);line-height:var(--leading-tight)}
+.home-header__sub{margin:2px 0 0;font-size:var(--text-sm);color:var(--color-text-muted)}
+.date-strip-wrap{display:flex;align-items:center;gap:var(--space-2);margin:0 0 var(--space-4)}
+.date-strip{list-style:none;margin:-6px 0 -10px -8px;padding:6px 12px 14px 8px;display:flex;gap:var(--space-2);overflow-x:auto;scrollbar-width:none;flex:1;min-inline-size:0}
+.date-strip::-webkit-scrollbar{display:none}
+.date-chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-inline-size:50px;block-size:66px;border:0;border-radius:var(--radius-pill);background:var(--color-surface);box-shadow:var(--shadow-sm);color:var(--color-text);font:inherit;cursor:pointer}
+.date-chip strong{font-size:var(--text-lg);font-weight:var(--weight-bold);line-height:1}
+.date-chip small{font-size:var(--text-xs);color:var(--color-text-muted)}
+.date-chip[aria-pressed="true"]{background:var(--color-accent-strong);color:var(--color-text-on-accent);box-shadow:var(--shadow-accent)}
+.date-chip[aria-pressed="true"] small{color:var(--color-text-on-accent)}
+.date-strip__more{position:relative;flex:none;overflow:hidden}
+.date-strip__more input{position:absolute;inset:0;inline-size:100%;block-size:100%;opacity:0;cursor:pointer}
+.hero-today{display:grid;grid-template-columns:140px 1fr;gap:var(--space-5);align-items:center}
+.hero-today .ring-wrap{inline-size:140px}
+.ring__big{font-size:var(--text-3xl);font-weight:var(--weight-black);line-height:1}
+.kv{display:flex;flex-direction:column;gap:var(--space-3)}
+.kv .stat__value{margin:0;font-size:var(--text-xl)}
+.earned{color:var(--color-accent-ink)}
+.macro-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-3);margin-top:var(--space-5);padding-top:var(--space-4);border-top:1px solid var(--color-border)}
+.macro-grid strong{font-size:var(--text-md);font-variant-numeric:tabular-nums}
+.macro-grid .meter{margin-top:6px;height:6px}
+.or{display:flex;align-items:center;gap:var(--space-3);margin:var(--space-4) 0 var(--space-3);color:var(--color-text-muted);font-size:var(--text-sm)}
+.or::before,.or::after{content:"";flex:1;border-top:1px solid var(--color-border)}
+.photo-preview{inline-size:100%;max-block-size:220px;object-fit:cover;border-radius:var(--radius-lg)}
+.notes{list-style:none;margin:var(--space-3) 0 0;padding:0;display:grid;gap:var(--space-1);font-size:var(--text-sm);color:var(--color-text-muted)}
+.edit-item{padding:var(--space-3) 0;border-top:1px solid var(--color-border)}
+.edit-item.extra{background:var(--color-accent-soft);border-radius:var(--radius-md);padding:var(--space-3);border:0;margin:var(--space-2) 0}
+.edit-head{display:flex;gap:var(--space-2);align-items:end}.edit-head .field{flex:1;margin:0}
+.sets-row{display:grid;grid-template-columns:1fr 88px;gap:var(--space-2)}
+/* Side by side the columns only need a thumb's width between them, but stacked rows each carry
+   a label, so they need the gap a field would get. */
+.two-col{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--space-2);row-gap:var(--space-4)}
+/* Fields side by side line up on their boxes: no stacked-field gap, and a label that wraps sits above its own box. */
+.two-col>.field,.sets-row>.field{margin:0;justify-content:flex-end}
+.editor-total{font-weight:var(--weight-bold);margin:var(--space-3) 0 0}
+.row-actions{display:flex;gap:var(--space-2);margin-top:var(--space-2)}
+/* A hint belongs to the control above it: it rides the field's own 6px gap, so it reads as part
+   of that field, and the field that carries one takes extra air before the next one. */
+.field > .hint{margin:0}
+.field:has(> .hint) + .field{margin-top:var(--space-5)}
+.streak-dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:var(--space-4)}
+.streak-dots span{aspect-ratio:1;border-radius:8px;background:color-mix(in srgb,var(--color-bg) 18%,transparent)}
+.streak-dots span.on{background:var(--color-accent)}
+.status{min-block-size:1.2em;margin:var(--space-2) 0 0;font-size:var(--text-sm);color:var(--color-text-muted)}
+.status.error{color:var(--color-over-ink);font-weight:var(--weight-semibold)}
+.mono{font-family:ui-monospace,monospace;font-size:var(--text-sm)}
+#save-meal:disabled{display:none}
+#workouts:not(.is-reviewing) .workout-review,#workouts.is-reviewing .workout-compose{display:none}
+.est{color:var(--color-text-muted);font-weight:var(--weight-semibold)}
+/* About you: figure beside a height ruler, and the fuel bar */
+.about__stage{display:grid;grid-template-columns:148px minmax(0,1fr);gap:var(--space-4);align-items:end;margin:var(--space-4) 0}
+/* A grid column will not shrink below its contents unless told to, and a range input carries a
+   wide intrinsic size, so the figure plus the controls used to push the whole page sideways on a
+   narrow phone. Below that, the figure stops earning its column and the controls take the width. */
+@media (max-width:380px){.about__stage{grid-template-columns:minmax(0,1fr)}.about__figure{display:none}}
+.about__figure{margin:0;position:relative}
+.about__figure svg{inline-size:100%;block-size:auto;display:block;overflow:visible}
+.ruler__spine,.ruler__tick{stroke:var(--color-chart-neutral);stroke-width:1.5;stroke-linecap:round}
+.ruler__tick--minor{stroke-width:1}
+.ruler__label{font-size:10px;fill:var(--color-text-muted);font-family:var(--font-sans);font-weight:var(--weight-semibold)}
+.figure__mark{stroke:var(--color-accent);stroke-width:1.5;stroke-dasharray:3 3;transition:all var(--duration-base) var(--ease-out)}
+.figure__body{transform-origin:0 0;transition:transform var(--duration-slow) var(--ease-out)}
+.figure__body--unset{opacity:.45}
+.avatar{overflow:hidden;padding:0}.avatar__img{inline-size:100%;block-size:100%;object-fit:cover;display:block}
+.figure__shadow{fill:var(--color-text);opacity:.08}
+.figure__motion{fill:none;stroke:var(--color-accent);stroke-width:2.5;stroke-linecap:round;opacity:calc(.85 - var(--i) * .2)}
+.about__weight{position:absolute;inset-inline:0;bottom:-2px;text-align:center}
+.about__weight span{display:inline-block;background:var(--color-surface);border-radius:var(--radius-pill);padding:2px var(--space-2);font-size:var(--text-xs);font-weight:var(--weight-bold);box-shadow:var(--shadow-sm)}
+.about__controls{display:grid;gap:var(--space-3)}
+.about__controls .field{margin:0}
+.about__activity{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);margin:var(--space-2) 0 0}
+.activity-tile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:var(--space-3);border-radius:var(--radius-lg);background:var(--color-surface-2);border:2px solid transparent;text-align:left;cursor:pointer;min-block-size:76px;color:var(--color-text);font:inherit;transition:border-color var(--duration-base) var(--ease-out),background var(--duration-base) var(--ease-out)}
+.activity-tile .activity-tile__icon{font-size:22px;line-height:1}
+.activity-tile strong{font-size:var(--text-sm)}
+.activity-tile small{font-size:var(--text-xs);color:var(--color-text-muted)}
+.activity-tile[aria-checked="true"]{border-color:var(--color-accent);background:var(--color-accent-soft)}
+.fuel{margin-top:var(--space-5);padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface-2)}
+.fuel__head{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-3)}
+.fuel__number{margin:0;font-size:var(--text-4xl);font-weight:var(--weight-black);letter-spacing:var(--tracking-number);line-height:var(--leading-tight);color:var(--color-accent-ink)}
+.fuel__math{margin:0 0 var(--space-1);font-size:var(--text-sm);font-weight:var(--weight-semibold)}
+.fuel__protein{text-align:right}.fuel__protein .stat__value{margin:0}
+.fuel__bar{position:relative;display:flex;block-size:14px;border-radius:var(--radius-pill);overflow:hidden;background:var(--color-surface-3);margin:var(--space-3) 0 var(--space-2)}
+.fuel__fill{background:var(--color-accent);inline-size:0;transition:inline-size var(--duration-slow) var(--ease-out)}
+.fuel__cut{inline-size:0;background:repeating-linear-gradient(135deg,var(--color-under) 0 4px,var(--color-under-soft) 4px 8px);transition:inline-size var(--duration-slow) var(--ease-out)}
+.fuel__cut.gain{background:repeating-linear-gradient(135deg,var(--color-info) 0 4px,var(--color-info-soft) 4px 8px)}
+.workout .list-row__title{white-space:normal;overflow:visible}
+.workout+.workout{border-top:1px solid var(--color-border);margin-top:var(--space-2);padding-top:var(--space-2)}
+.exercises{list-style:none;margin:0 0 var(--space-1);padding:0;display:grid;gap:var(--space-3)}
+.exercise{padding:var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-2)}
+.exercise__head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-2);flex-wrap:wrap}
+.set-chips{list-style:none;margin:var(--space-2) 0 0;padding:0;display:flex;flex-wrap:wrap;gap:var(--space-2)}
+.set-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:var(--radius-pill);background:var(--color-surface);font-size:var(--text-sm);font-weight:var(--weight-semibold);box-shadow:var(--shadow-sm)}
+.set-chip__n{display:inline-grid;place-items:center;inline-size:20px;block-size:20px;border-radius:50%;background:var(--color-accent-soft);color:var(--color-accent-ink);font-size:var(--text-xs);font-weight:var(--weight-bold)}
+.macro__meter{position:relative;margin-top:6px}
+.macro-grid .macro__meter{height:8px}
+.macro__mark{position:absolute;top:0;bottom:0;left:calc(var(--m) * 1%);inline-size:3px;margin-left:-1.5px;background:var(--color-text);border-radius:2px;box-shadow:0 0 0 1.5px var(--color-surface)}
+.macro__status{margin:4px 0 0;font-size:var(--text-xs);font-weight:var(--weight-semibold);color:var(--color-text-muted)}
+.macro__status.is-concern{color:var(--color-over-ink)}
+.macro__status.is-on{color:var(--color-under-ink)}
+.input-row--4{grid-template-columns:repeat(4,minmax(0,1fr));align-items:end}
+.tip__list{margin:6px 0 0;padding-left:1.1em;display:grid;gap:4px}
+#sync-status{text-align:center;font-size:var(--text-xs);color:var(--color-text-muted);margin:var(--space-6) 0 0}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8a3 3 0 0 0 3 3v7M10 3v6M4 3v6a3 3 0 0 0 3 3M17 21V3c2.5 1 3.5 4 3.5 7s-1.5 4-3.5 4"/></symbol>
+    <symbol id="i-dumbbell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-steps" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3c-2 0-3 2.5-3 5s1 4 3 4 3-1.5 3-4-1-5-3-5zM5.5 15h5v2a2.5 2.5 0 0 1-5 0zM16 7c2 0 3 2.5 3 5s-1 4-3 4-3-1.5-3-4 1-5 3-5zM13.5 19h5v.5a2.5 2.5 0 0 1-5 0z"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4 0-7-2.5-7-6.5 0-3.5 3-5.5 3-9 2.5 1.5 4 4 4 6 1-1 1.5-2 1.5-3.5C16 9.5 19 12 19 15c0 3.5-3 6-7 6z"/></symbol>
+    <symbol id="i-mood" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5s1.3 1.8 3.5 1.8 3.5-1.8 3.5-1.8"/><path d="M9 9.5h.01M15 9.5h.01"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2.5 5.5 13H11l-1 8.5L18.5 11H13z"/></symbol>
+    <symbol id="i-ache" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M16.9 7.1a7 7 0 0 1 0 9.8M7.1 16.9a7 7 0 0 1 0-9.8M19.8 4.2a11 11 0 0 1 0 15.6M4.2 19.8a11 11 0 0 1 0-15.6"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-watch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 6l1-3h4l1 3M9 18l1 3h4l1-3M12 10v2.5l1.5 1"/></symbol>
+  </defs>
+</svg>
+
+<!-- First run: the setup flow, built by setup-view.mjs. It covers the app until it is done or put off. -->
+<section class="setup" id="setup" role="dialog" aria-modal="true" aria-label="Set up Streak" hidden></section>
+
+<main class="app">
+  <!-- Sticky on every screen: who is signed in, and the day the Today, Log and Workouts screens show. -->
+  <div class="topbar" id="topbar">
+    <header class="home-header">
+      <button class="avatar avatar--lg" type="button" data-go="settings" aria-label="Settings and account">·</button>
+      <div><p class="home-header__hi" id="greeting">Hi 👋</p><p class="home-header__sub" id="greeting-sub">Here’s your day so far</p></div>
+    </header>
+    <div class="date-strip-wrap">
+      <ol class="date-strip" id="date-strip" aria-label="Choose a day"></ol>
+      <label class="date-strip__more btn btn--secondary btn--icon" aria-label="Pick an earlier date"><svg><use href="#i-cal"/></svg><input type="date" id="day" required></label>
+      </div>
+  </div>
+
+  <!-- TODAY -->
+  <section class="screen" id="screen-today" role="tabpanel" aria-labelledby="tab-today">
+    <section class="checkin" id="checkin-flow" aria-label="Daily check-in" aria-live="polite" hidden></section>
+    <article class="card" id="today-card" aria-live="polite" style="margin-top:var(--space-3)"></article>
+    <div class="tip" id="today-tip" hidden style="margin-top:var(--space-3)"><span class="tip__icon"><svg><use href="#i-spark"/></svg></span><div><strong></strong><ul class="tip__list"></ul></div></div>
+    <h2 class="section-title">This week <button class="btn btn--ghost" type="button" data-go="analytics">Details</button></h2>
+    <article class="card" id="week-card"></article>
+    <h2 class="section-title">Recovery <span class="hint" id="recovery-hint"></span></h2>
+    <article class="card card--dark readiness" id="recovery-score" aria-live="polite" hidden></article>
+    <div class="tile-grid" id="recovery" style="margin-top:var(--space-3)"></div>
+    <h2 class="section-title">Check-in</h2>
+    <article class="card" id="feel-card" style="margin-bottom:var(--space-3)"></article>
+    <form class="card" id="form">
+      <div class="two-col">
+        <div class="field"><label class="label" for="weight">Weight</label><div class="field__box"><input class="input num" id="weight" type="number" inputmode="decimal" min="50" max="700" step="0.1" placeholder="Optional"><span class="field__unit" id="weight-unit-label">lb</span></div></div>
+        <div class="field" style="margin:0"><label class="label" for="kind">Day type</label><select class="select" id="kind"><option value="">Choose</option><option>Workday</option><option>Light day</option><option>Mom’s</option><option>Family event</option><option>Workday + event</option><option>Travel</option><option>Travel + event</option><option>Other</option></select></div>
+      </div>
+      <div class="field"><label class="label" for="note">Note</label><textarea class="textarea" id="note" rows="2" placeholder="Family dinner, dessert, slept badly…"></textarea></div>
+      <button class="btn btn--primary btn--block" style="margin-top:var(--space-3)">Save check-in</button>
+      <p class="status" id="status" role="status"></p>
+    </form>
+  </section>
+
+  <!-- LOG -->
+  <section class="screen" id="screen-log" role="tabpanel" aria-labelledby="tab-log" hidden>
+    <h1 class="screen-title">Food log</h1>
+    <article class="card" id="meal-log">
+      <h2 class="card__title">Add a meal</h2>
+      <p class="card__sub">Snap or pick a photo and we’ll estimate calories and macros. You can correct anything before saving.</p>
+      <button class="btn btn--primary btn--lg btn--block" type="button" id="snap-meal" style="margin-top:var(--space-4)"><svg><use href="#i-camera"/></svg>Snap a meal</button>
+      <input type="file" id="photo-input" accept="image/*" hidden>
+      <div class="field" id="meal-again" hidden style="margin-top:var(--space-4)"><label class="label" for="meal-again-list">Eat again</label><select class="select" id="meal-again-list"></select></div>
+      <div id="photo-panel" hidden style="margin-top:var(--space-4)">
+        <img class="photo-preview" id="photo-preview" alt="Meal photo being analysed">
+        <div class="field"><label class="label" for="photo-hint">Add a detail, then re-check (optional)</label><input class="input" id="photo-hint" maxlength="300" placeholder="e.g. cooked in 1 tbsp ghee, 2 rotis under the curry"></div>
+        <button class="btn btn--secondary btn--block" type="button" id="photo-recheck" style="margin-top:var(--space-2)">Re-check photo</button>
+      </div>
+      <div class="or">or describe it</div>
+      <div class="field"><label class="label" for="meal-kind">Meal</label><select class="select" id="meal-kind"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack / drink</option></select></div>
+      <div class="field"><label class="visually-hidden" for="meal-text">What did you eat?</label><textarea class="textarea" id="meal-text" rows="3" placeholder="2 rotis, 150 g chicken curry, 1 cup sabzi"></textarea>
+        <p class="hint">🎙 Tap the box and use your keyboard’s microphone to just say it. Mention portions, oil, ghee and sugar when you know them.</p></div>
+      <div class="field" style="margin-top:var(--space-3)">
+        <label class="row-between" for="batch-on" style="cursor:pointer"><span class="label">Cooked a batch for others?</span><input type="checkbox" id="batch-on"></label>
+        <div id="batch-fields" hidden>
+          <p class="hint" style="margin-top:var(--space-2)">Describe what went in the pot, dry and raw, then say how many it fed. Dividing the pot beats judging a plate by eye.</p>
+          <div class="two-col" style="margin-top:var(--space-3)">
+            <div class="field" style="margin:0"><label class="label" for="batch-made">It made</label><input class="input num" id="batch-made" type="number" inputmode="numeric" min="1" max="50" step="1" placeholder="8"></div>
+            <div class="field" style="margin:0"><label class="label" for="batch-ate">You had</label><input class="input num" id="batch-ate" type="number" inputmode="decimal" min="0.5" step="0.5" value="1"></div>
+          </div>
+          <p class="hint" id="batch-share" style="margin-top:var(--space-2)"></p>
+        </div>
+      </div>
+      <button class="btn btn--secondary btn--block" type="button" id="estimate-meal" style="margin-top:var(--space-3)">Estimate</button>
+      <ul class="notes" id="photo-notes"></ul>
+      <div class="field" id="meal-servings-field" hidden><span class="label" id="meal-servings-label">Servings</span><div class="segmented" role="group" aria-labelledby="meal-servings-label" id="meal-servings"><button type="button" data-factor="0.5" aria-pressed="false">½</button><button type="button" data-factor="1" aria-pressed="true">1</button><button type="button" data-factor="1.5" aria-pressed="false">1½</button><button type="button" data-factor="2" aria-pressed="false">2</button></div></div>
+      <div id="meal-preview"></div>
+      <button class="btn btn--primary btn--block" type="button" id="save-meal" disabled style="margin-top:var(--space-3)">Save meal</button>
+      <p class="status" id="meal-status" role="status"></p>
+    </article>
+    <h2 class="section-title">Meals <span class="hint num" id="meal-total"></span></h2>
+    <p class="hint" id="meal-partial"></p>
+    <div class="stack" id="meal-history"></div>
+    <p class="hint" style="margin-top:var(--space-3)">Estimates use typical recipes and 4 kcal/g for protein and carbs, 9 kcal/g for fat. Portions and cooking oil vary.</p>
+  </section>
+
+  <!-- WORKOUTS -->
+  <section class="screen" id="screen-workouts" role="tabpanel" aria-labelledby="tab-workouts" hidden>
+    <h1 class="screen-title">Workouts</h1>
+    <article class="card" id="workouts">
+      <h2 class="card__title" id="workout-card-title">Log a session</h2>
+      <div class="workout-compose">
+        <p class="card__sub" style="margin-bottom:var(--space-3)">Speak or type it the way you’d text a friend.</p>
+        <div class="field"><label class="visually-hidden" for="workout-text">Workout notes</label>
+          <textarea class="textarea" id="workout-text" rows="4" maxlength="2000" placeholder="Push day: bench 3 sets of 8 at 135, incline dumbbells 3x10 with 50s, then 20 minutes on the treadmill"></textarea>
+          <p class="hint">🎙 Use your keyboard’s microphone. We’ll pick out exercises, sets and weights, and you can check them before saving.</p></div>
+        <div class="row-between" style="margin-top:var(--space-3)">
+          <button class="btn btn--secondary" type="button" id="manual-workout">Enter by hand</button>
+          <button class="btn btn--primary" type="button" id="estimate-workout" style="flex:1">Log it</button>
+        </div>
+        <div class="field" id="workout-again" hidden style="margin-top:var(--space-4)"><label class="label" for="workout-again-list">Do again</label><select class="select" id="workout-again-list"></select></div>
+      </div>
+      <div id="workout-editor"></div>
+      <div class="row-actions workout-review action-dock" style="margin-top:var(--space-4)">
+        <button class="btn btn--secondary" type="button" id="cancel-workout">Cancel</button>
+        <button class="btn btn--primary" type="button" id="save-workout" disabled style="flex:1">Save workout</button>
+      </div>
+      <p class="status" id="workout-status" role="status"></p>
+    </article>
+    <div class="tile-grid" id="workout-tiles" style="margin-top:var(--space-3)"></div>
+    <h2 class="section-title">On this day</h2>
+    <article class="card"><ul class="list" id="workout-history"></ul></article>
+    <h2 class="section-title">Exercise progress</h2>
+    <article class="card"><ul class="list" id="exercise-progress"></ul></article>
+    <p class="hint" style="margin-top:var(--space-3)">Workout calories are added to that day’s allowance. If your Watch also shows extra activity that day, the larger of the two counts, never both.</p>
+  </section>
+
+  <!-- ANALYTICS -->
+  <section class="screen" id="screen-analytics" role="tabpanel" aria-labelledby="tab-analytics" hidden>
+    <header class="app-header">
+      <div><p class="app-header__date" id="range-label"></p><h1 class="app-header__title">Analytics</h1></div>
+    </header>
+    <div class="segmented" role="group" aria-label="Range" id="range">
+      <button type="button" aria-pressed="false" data-days="7">7 days</button><button type="button" aria-pressed="true" data-days="30">30 days</button><button type="button" aria-pressed="false" data-days="90">90 days</button>
+    </div>
+    <div id="analytics"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="screen" id="screen-settings" role="tabpanel" hidden>
+    <header class="app-header">
+      <div><p class="app-header__date" id="account">Signed in</p><h1 class="app-header__title">Settings</h1></div>
+      <button class="btn btn--secondary btn--icon" type="button" data-go="today" aria-label="Back to Today"><svg><use href="#i-left"/></svg></button>
+    </header>
+    <h2 class="section-title">You</h2>
+    <article class="card about" id="about">
+      <p class="card__sub">Everything your allowance is worked out from. Change any of it and the number at the bottom follows.</p>
+      <div class="about__stage">
+        <figure class="about__figure">
+          <svg id="figure" aria-hidden="true"></svg>
+          <figcaption class="about__weight" id="figure-weight"></figcaption>
+        </figure>
+        <div class="about__controls">
+          <div class="field">
+            <label class="label" for="height">Height</label>
+            <div class="picker"><output class="picker__value" id="height-readout" for="height">5′10″</output>
+            <input class="range" id="height" type="range" min="54" max="84" step="1" value="70"></div>
+          </div>
+          <div class="field">
+            <span class="label" id="born-label">Born in</span>
+            <div class="picker"><div class="picker__row" role="group" aria-labelledby="born-label">
+              <button class="btn btn--secondary btn--icon" type="button" id="born-down" aria-label="Earlier year">−</button>
+              <output class="picker__value" id="born" aria-live="polite">1990</output>
+              <button class="btn btn--secondary btn--icon" type="button" id="born-up" aria-label="Later year">+</button>
+            </div></div>
+            <p class="hint" id="age-readout"></p>
+          </div>
+          <div class="field">
+            <span class="label" id="build-label">Body (for the formula)</span>
+            <div class="segmented" role="group" aria-labelledby="build-label" id="sex"><button type="button" aria-pressed="false" data-sex="male">Male</button><button type="button" aria-pressed="false" data-sex="female">Female</button></div>
+          </div>
+          <div class="field">
+            <span class="label" id="unit-label">Weigh in</span>
+            <div class="segmented" role="group" aria-labelledby="unit-label" id="weight-unit"><button type="button" aria-pressed="true" data-unit="lb">lb</button><button type="button" aria-pressed="false" data-unit="kg">kg</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label class="label" for="about-weight">Weight today</label><div class="field__box"><input class="input num" id="about-weight" type="number" inputmode="decimal" min="50" max="700" step="0.1" placeholder="e.g. 190"><span class="field__unit" id="about-weight-unit">lb</span></div></div>
+        <div class="field" style="margin:0"><label class="label" for="goal-weight">Goal weight</label><div class="field__box"><input class="input num" id="goal-weight" type="number" inputmode="decimal" min="50" max="700" step="0.1" placeholder="Optional"><span class="field__unit" id="goal-weight-unit">lb</span></div></div>
+      </div>
+      <div class="field"><label class="label" for="goal-date">Reach the goal by (optional)</label><input class="input" id="goal-date" type="date"></div>
+      <span class="label" id="activity-label">How active is a normal week?</span>
+      <div class="about__activity" role="radiogroup" aria-labelledby="activity-label" id="activity"></div>
+      <div class="fuel" id="fuel" hidden>
+        <div class="fuel__head">
+          <div><p class="label">Your daily allowance</p><p class="fuel__number num"><span id="fuel-allowance">0</span><span class="stat__unit">kcal</span></p></div>
+          <div class="fuel__protein"><p class="label">Protein</p><p class="stat__value num"><span id="fuel-protein">0</span><span class="stat__unit">g</span></p></div>
+        </div>
+        <div class="fuel__bar" aria-hidden="true"><span class="fuel__fill" id="fuel-fill"></span><span class="fuel__cut" id="fuel-cut"></span></div>
+        <p class="fuel__math num" id="fuel-math"></p><p class="hint" id="fuel-explain"></p>
+        <button class="btn btn--secondary" type="button" id="use-suggestion" style="margin-top:var(--space-3)" hidden>Use as allowance</button>
+      </div>
+      <div class="row-actions" style="margin-top:var(--space-4)">
+        <button class="btn btn--primary" type="button" id="save-about" style="flex:1">Save</button>
+        <button class="btn btn--secondary" type="button" id="clear-goal">Clear goal</button>
+      </div>
+      <p class="status" id="about-status" role="status"></p>
+      <p class="card__foot"><button class="btn btn--ghost" type="button" id="rerun-setup">Walk me through it again</button></p>
+    </article>
+    <h2 class="section-title">Your calories</h2>
+    <article class="card" id="energy">
+      <p class="card__sub">What you get in a day, and how the week spreads it out.</p>
+      <div class="field" style="margin-top:var(--space-4)">
+        <label class="label" for="kcal-target">Daily allowance</label>
+        <div class="field__box"><input class="input num" id="kcal-target" type="number" inputmode="numeric" min="800" max="6000" step="50" placeholder="e.g. 2000"><span class="field__unit">kcal</span></div>
+        <p class="hint">Worked out from You above. Type your own to override it, from today on.</p>
+      </div>
+      <div class="field">
+        <label class="label" for="exercise-share">Eat back exercise calories</label>
+        <select class="select" id="exercise-share"><option value="1">All of them</option><option value="0.75">Most of them (75%)</option><option value="0.5">Half of them (50%)</option><option value="0">None</option></select>
+        <p class="hint">Pick half if your Watch tends to overcount.</p>
+      </div>
+      <div class="field-group" id="shape">
+        <h3 class="field-group__title">Across the week</h3>
+        <p class="hint">Seven days of that allowance is the week’s total. These only move calories between the days.</p>
+        <div class="two-col" style="margin-top:var(--space-3)">
+          <div class="field"><label class="label" for="weekend-boost">Weekend</label><div class="field__box"><input class="input num" id="weekend-boost" type="number" inputmode="numeric" min="0" max="1000" step="50" placeholder="0"><span class="field__unit">+ kcal</span></div></div>
+          <div class="field" style="margin:0"><label class="label" for="event-boost">Event day</label><div class="field__box"><input class="input num" id="event-boost" type="number" inputmode="numeric" min="0" max="2000" step="50" placeholder="500"><span class="field__unit">+ kcal</span></div></div>
+        </div>
+        <div class="two-col">
+          <div class="field"><label class="label" for="light-cut">Light day</label><div class="field__box"><input class="input num" id="light-cut" type="number" inputmode="numeric" min="0" max="1500" step="50" placeholder="300"><span class="field__unit">− kcal</span></div></div>
+          <div class="field" style="margin:0"><label class="label" for="day-cap">Most in one day</label><div class="field__box"><input class="input num" id="day-cap" type="number" inputmode="numeric" min="0" max="6000" step="50" placeholder="No limit"><span class="field__unit">kcal</span></div></div>
+        </div>
+        <p class="hint" id="shape-preview"></p>
+      </div>
+      <button class="btn btn--primary btn--block" type="button" id="save-calories" style="margin-top:var(--space-4)">Save</button>
+      <p class="status" id="energy-status" role="status"></p>
+    </article>
+    <h2 class="section-title">Apple Watch</h2>
+    <article class="card" id="health">
+      <p class="card__sub">An iPhone Shortcut sends your calories, steps, sleep and heart data here twice a day.</p>
+      <p id="health-state" style="margin:var(--space-4) 0 var(--space-3)">Checking…</p>
+      <div class="row-actions"><button class="btn btn--secondary" type="button" id="health-create">Create Shortcut key</button><button class="btn btn--danger" type="button" id="health-revoke" hidden>Disconnect</button></div>
+      <p class="status" id="health-status" role="status"></p>
+      <div class="field-group" id="health-setup" hidden>
+        <h3 class="field-group__title">Set up the Shortcut</h3>
+        <div class="edit-head" style="margin-top:var(--space-3)">
+          <div class="field"><label class="label" for="health-key">Your key (shown once)</label><input class="input mono" id="health-key" readonly></div>
+          <button class="btn btn--secondary" type="button" id="health-copy-key">Copy</button>
+        </div>
+        <div class="edit-head" style="margin-top:var(--space-3)">
+          <div class="field"><label class="label" for="health-url">Upload address</label><input class="input mono" id="health-url" readonly></div>
+          <button class="btn btn--secondary" type="button" id="health-copy-url">Copy</button>
+        </div>
+        <p class="hint" style="margin-top:var(--space-3)">Paste the key into the Shortcut’s Authorization header as <code>Bearer</code> followed by the key. It posts <code>date</code>, <code>activeKcal</code>, <code>restingKcal</code>, <code>steps</code>, <code>restingHR</code>, <code>hrv</code> and sleep durations.</p>
+      </div>
+    </article>
+    <div id="people-section" hidden>
+    <h2 class="section-title">People</h2>
+    <article class="card" id="people">
+      <p class="card__sub">Invite someone by email. They get their own private log.</p>
+      <div class="field" style="margin-top:var(--space-4)"><label class="label" for="people-email">Email</label><input class="input" id="people-email" type="email" inputmode="email" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="name@example.com" maxlength="254"></div>
+      <div class="row-actions"><button class="btn btn--primary" type="button" id="people-invite" style="flex:1">Invite</button><button class="btn btn--secondary" type="button" id="people-share">Share link</button></div>
+      <p class="status" id="people-status" role="status"></p>
+      <ul class="list" id="people-list"></ul>
+    </article>
+    </div>
+    <h2 class="section-title">Account</h2>
+    <article class="card">
+      <a class="btn btn--secondary btn--block" href="/cdn-cgi/access/logout">Sign out</a>
+      <div class="field-group">
+        <h3 class="field-group__title">Import old history</h3>
+        <p class="hint">A .json backup. Days you have already logged are never overwritten.</p>
+        <p class="file-field"><label class="btn btn--secondary" for="import-file">Choose a backup file</label><input class="visually-hidden" type="file" id="import-file" accept="application/json,.json"></p>
+        <p class="status" id="import-status" role="status"></p>
+      </div>
+    </article>
+  </section>
+
+  <p id="sync-status" role="status">Connecting to sync…</p>
+</main>
+
+<nav class="tabbar" aria-label="Main">
+  <div class="tabbar__inner" role="tablist">
+    <button class="tabbar__item" type="button" role="tab" id="tab-today" aria-controls="screen-today" aria-selected="true" data-tab="today"><svg><use href="#i-home"/></svg>Today</button>
+    <button class="tabbar__item" type="button" role="tab" id="tab-log" aria-controls="screen-log" aria-selected="false" data-tab="log"><svg><use href="#i-log"/></svg>Log</button>
+    <button class="tabbar__fab" type="button" id="fab-snap" aria-label="Snap a meal"><svg><use href="#i-camera"/></svg></button>
+    <button class="tabbar__item" type="button" role="tab" id="tab-workouts" aria-controls="screen-workouts" aria-selected="false" data-tab="workouts"><svg><use href="#i-dumbbell"/></svg>Workouts</button>
+    <button class="tabbar__item" type="button" role="tab" id="tab-analytics" aria-controls="screen-analytics" aria-selected="false" data-tab="analytics"><svg><use href="#i-chart"/></svg>Analytics</button>
+  </div>
+</nav>
+
+<script src="/sync.js"></script>
+<script type="module" src="/shell.mjs"></script>
+<script type="module" src="/checkin.mjs"></script>
+<script type="module" src="/meals.mjs"></script>
+<script type="module" src="/workouts.mjs"></script>
+<script type="module" src="/today-view.mjs"></script>
+<script type="module" src="/analytics-view.mjs"></script>
+<script type="module" src="/settings-view.mjs"></script><script type="module" src="/about-view.mjs"></script>
+<script type="module" src="/health-view.mjs"></script>
+<script type="module" src="/people-view.mjs"></script>
+<script type="module" src="/feel-view.mjs"></script>
+<script type="module" src="/checkin-flow.mjs"></script>
+<script type="module" src="/setup-view.mjs"></script>
+<script type="module" src="/import.mjs"></script>
+</body>
+</html>

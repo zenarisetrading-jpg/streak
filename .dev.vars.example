@@ -1,0 +1,7 @@
+# Copy to .dev.vars for local testing only. Never commit .dev.vars — it is gitignored.
+# On localhost there is no Cloudflare Access in front of the app, so this stands in for the
+# signed-in account. It has no effect on a deployed Worker.
+DEV_USER_EMAIL=you@example.com
+# Optional, to try real photo and meal analysis locally. In production this is a Worker secret
+# (`npm run cf -- secret put ANTHROPIC_API_KEY`), never a file.
+# ANTHROPIC_API_KEY=

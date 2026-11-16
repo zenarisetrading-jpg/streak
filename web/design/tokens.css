@@ -1,0 +1,1205 @@
+/* Daily Check-in design system — tokens and components.
+   Documented in DESIGN.md. Every value a screen needs should come from a
+   token below; component classes use only tokens, never raw values. */
+
+/* ───────────────────────── Tokens ───────────────────────── */
+
+:root {
+  color-scheme: light dark;
+
+  /* Colour: surfaces */
+  --color-bg: #F4F4F1;            /* app background, warm off-white */
+  --color-surface: #FFFFFF;       /* cards, tab bar, inputs */
+  --color-surface-2: #F0F0EC;     /* inset areas, chart tracks, input fill */
+  --color-surface-3: #E6E6E1;     /* pressed states, skeletons */
+  --color-border: #E3E3DE;        /* hairlines between list rows */
+  --color-border-strong: #C9C9C2; /* input borders */
+
+  /* Colour: text */
+  --color-text: #17171C;          /* primary text, big numbers */
+  --color-text-muted: #62626C;    /* labels, secondary text (5.4:1 on bg) */
+  --color-text-subtle: #8A8A94;   /* placeholders, decorative only (not for content) */
+  --color-text-on-accent: #FFFFFF;
+
+  /* Colour: accent (orange) */
+  --color-accent: #F2561D;        /* fills: ring, bars, FAB, highlights (3:1 graphics) */
+  --color-accent-strong: #C73E0A; /* backgrounds that carry white text: buttons, accent tiles (5.1:1) */
+  --color-accent-pressed: #B3370A; /* hover/pressed state of accent-strong */
+  --color-accent-soft: #FDEBE3;   /* tinted backgrounds, selected chips */
+  --color-accent-ink: #A8340A;    /* accent-coloured text: links, active tab, text on accent-soft */
+  --color-on-dark-muted: color-mix(in srgb, var(--color-bg) 70%, transparent); /* secondary text on an inverted card */
+
+  /* Colour: status. "Under" is calm green, "over" is the orange/red family. */
+  --color-under: #2E9E66;         /* under-allowance fills */
+  --color-under-ink: #1F7A4D;     /* under-allowance text (5.3:1) */
+  --color-under-soft: #E3F3EA;
+  --color-over: #E5482E;          /* over-allowance fills */
+  --color-over-ink: #B8321C;      /* over-allowance text */
+  --color-over-soft: #FCE8E3;
+  --color-info: #3A6FD8;          /* sleep / recovery series */
+  --color-info-soft: #E6EEFB;
+  /* Meal types. A category, not a verdict, so these stay clear of the status family: the hues sit
+     in the gaps the status colours leave (gold, teal and violet against accent 20°, over 10°,
+     under 150° and info 220°), and they are only ever worn as a tinted chip or a dot, never as a
+     bar, ring or meter. The emoji and the section name carry the same meaning, so nobody has to
+     read the colour to know which meal it is. */
+  --color-meal-breakfast: #B07D12;      /* gold — morning */
+  --color-meal-breakfast-soft: #F7E3BE;
+  --color-meal-lunch: #0F7D72;          /* teal — midday */
+  --color-meal-lunch-soft: #C9E8E3;
+  --color-meal-dinner: #5B53B5;         /* violet — evening */
+  --color-meal-dinner-soft: #DCDAF4;
+  --color-meal-snack: #5F6B78;          /* slate — anything between */
+  --color-meal-snack-soft: #DFE4EA;
+  --color-chart-grid: #E6E6E1;
+  --color-chart-neutral: #CFCFC8; /* future days, allowance band */
+
+
+  /* Typography */
+  --font-sans: "Outfit", ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-numeric: var(--font-sans);
+  --text-xs: 0.75rem;    /* 12 — eyebrow labels, axis ticks */
+  --text-sm: 0.875rem;   /* 14 — secondary text, units */
+  --text-md: 1rem;       /* 16 — body, inputs (never smaller on inputs: iOS zoom) */
+  --text-lg: 1.125rem;   /* 18 — card titles */
+  --text-xl: 1.375rem;   /* 22 — section and screen titles */
+  --text-2xl: 1.75rem;   /* 28 — stat values */
+  --text-3xl: 2.25rem;   /* 36 — hero numbers */
+  --text-4xl: 3rem;      /* 48 — single hero metric per screen */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 800;
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --tracking-label: 0.08em;   /* uppercase eyebrow labels */
+  --tracking-number: -0.02em; /* big numbers */
+
+  /* Spacing (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;   /* page gutter, card padding on phone */
+  --space-5: 20px;   /* card padding */
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --gutter: var(--space-4);
+
+  /* Radii */
+  --radius-sm: 10px;    /* chips inside cards, small badges */
+  --radius-md: 14px;    /* inputs, buttons, list thumbnails */
+  --radius-lg: 20px;    /* tiles */
+  --radius-xl: 26px;    /* cards */
+  --radius-pill: 999px;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(23, 23, 28, 0.04), 0 1px 1px rgba(23, 23, 28, 0.03);
+  --shadow-md: 0 1px 2px rgba(23, 23, 28, 0.04), 0 8px 24px -8px rgba(23, 23, 28, 0.10);
+  --shadow-lg: 0 2px 6px rgba(23, 23, 28, 0.06), 0 20px 40px -12px rgba(23, 23, 28, 0.18);
+  --shadow-accent: 0 8px 20px -6px rgba(242, 86, 29, 0.55);
+  --focus-ring: 0 0 0 3px var(--color-surface), 0 0 0 5px var(--color-accent);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 120ms;   /* press feedback */
+  --duration-base: 200ms;   /* hovers, toggles, tab switch */
+  --duration-slow: 600ms;   /* ring and bar fills on first paint */
+
+  /* Sizing */
+  --touch-target: 44px;
+  --app-max-width: 430px;
+  --tabbar-height: 64px;
+  --field-height: 50px;           /* one-line text fields and dropdowns, so side-by-side boxes line up */
+}
+
+/* Dark theme: follows the system unless the page sets data-theme on <html>. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #111114;
+    --color-surface: #1C1C21;
+    --color-surface-2: #26262C;
+    --color-surface-3: #303037;
+    --color-border: #2C2C33;
+    --color-border-strong: #45454E;
+    --color-text: #F4F4F5;
+    --color-text-muted: #A1A1AA;
+    --color-text-subtle: #75757F;
+    --color-accent: #FF6B35;
+    --color-accent-strong: #C73E0A;
+    --color-accent-soft: #3A2017;
+    --color-accent-ink: #FFA27D;
+    --color-under: #3CB371;
+    --color-under-ink: #6FD49A;
+    --color-under-soft: #17301F;
+    --color-over: #FF5A3D;
+    --color-over-ink: #FF8C75;
+    --color-over-soft: #3A1A15;
+    --color-info: #6E9BFF;
+    --color-info-soft: #1B2540;;
+    --color-meal-breakfast: #E8B860;
+    --color-meal-breakfast-soft: #4A3A14;
+    --color-meal-lunch: #5FD0C4;
+    --color-meal-lunch-soft: #113E38;
+    --color-meal-dinner: #A9A6F2;
+    --color-meal-dinner-soft: #2C2B5C;
+    --color-meal-snack: #A8B2BD;
+    --color-meal-snack-soft: #313840;
+    --color-chart-grid: #2C2C33;
+    --color-chart-neutral: #3A3A42;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.5), 0 20px 40px -12px rgba(0, 0, 0, 0.6);
+    --shadow-accent: 0 8px 20px -6px rgba(255, 107, 53, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #111114;
+  --color-surface: #1C1C21;
+  --color-surface-2: #26262C;
+  --color-surface-3: #303037;
+  --color-border: #2C2C33;
+  --color-border-strong: #45454E;
+  --color-text: #F4F4F5;
+  --color-text-muted: #A1A1AA;
+  --color-text-subtle: #75757F;
+  --color-accent: #FF6B35;
+  --color-accent-strong: #C73E0A;
+  --color-accent-soft: #3A2017;
+  --color-accent-ink: #FFA27D;
+  --color-under: #3CB371;
+  --color-under-ink: #6FD49A;
+  --color-under-soft: #17301F;
+  --color-over: #FF5A3D;
+  --color-over-ink: #FF8C75;
+  --color-over-soft: #3A1A15;
+  --color-info: #6E9BFF;
+  --color-info-soft: #1B2540;;
+  --color-meal-breakfast: #E8B860;
+  --color-meal-breakfast-soft: #4A3A14;
+  --color-meal-lunch: #5FD0C4;
+  --color-meal-lunch-soft: #113E38;
+  --color-meal-dinner: #A9A6F2;
+  --color-meal-dinner-soft: #2C2B5C;
+  --color-meal-snack: #A8B2BD;
+  --color-meal-snack-soft: #313840;
+  --color-chart-grid: #2C2C33;
+  --color-chart-neutral: #3A3A42;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.5), 0 20px 40px -12px rgba(0, 0, 0, 0.6);
+  --shadow-accent: 0 8px 20px -6px rgba(255, 107, 53, 0.45);
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3, p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.num { font-family: var(--font-numeric); font-variant-numeric: tabular-nums; letter-spacing: var(--tracking-number); }
+.muted { color: var(--color-text-muted); }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* Eyebrow label: small uppercase text above a number or section */
+.eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ───────────────────────── App shell ───────────────────────── */
+
+.app {
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: var(--space-4) var(--gutter) calc(var(--tabbar-height) + var(--space-10) + env(safe-area-inset-bottom));
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-5);
+}
+.app-header__date { font-size: var(--text-sm); color: var(--color-text-muted); font-weight: var(--weight-medium); }
+.app-header__title { font-size: var(--text-xl); font-weight: var(--weight-black); line-height: var(--leading-tight); letter-spacing: -0.01em; }
+
+.avatar {
+  inline-size: var(--touch-target);
+  block-size: var(--touch-target);
+  flex: none;
+  border-radius: var(--radius-pill);
+  display: grid;
+  place-items: center;
+  background: var(--color-accent-soft);
+  color: var(--color-accent-ink);
+  font-weight: var(--weight-bold);
+  border: 0;
+  cursor: pointer;
+}
+
+.stack { display: flex; flex-direction: column; gap: var(--space-3); }
+.section-title {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: var(--space-6) 0 var(--space-3);
+  font-size: var(--text-lg); font-weight: var(--weight-bold);
+}
+.section-title a, .section-title button { font-size: var(--text-sm); }
+
+/* Save and Cancel for a long form: they stay in reach just above the tab bar while the form
+   scrolls under them, so they are never hidden behind it. Sits on a card surface. */
+.action-dock {
+  position: sticky;
+  bottom: calc(var(--tabbar-height) + var(--space-3) + var(--space-2) + env(safe-area-inset-bottom));
+  z-index: 5;
+  padding-block: var(--space-2);
+  background: var(--color-surface);
+}
+
+/* ───────────────────────── Tab bar ───────────────────────── */
+
+.tabbar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 0 var(--gutter) calc(var(--space-3) + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.tabbar__inner {
+  pointer-events: auto;
+  max-width: calc(var(--app-max-width) - 2 * var(--gutter));
+  margin: 0 auto;
+  height: var(--tabbar-height);
+  display: grid;
+  grid-template-columns: 1fr 1fr auto 1fr 1fr;
+  align-items: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-lg);
+  padding: 0 var(--space-2);
+}
+.tabbar__item {
+  min-height: var(--touch-target);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border: 0; background: none; cursor: pointer;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: 0.6875rem; font-weight: var(--weight-semibold);
+  text-decoration: none;
+  transition: color var(--duration-base) var(--ease-out);
+}
+.tabbar__item svg { width: 24px; height: 24px; }
+.tabbar__item[aria-current="page"], .tabbar__item[aria-selected="true"] { color: var(--color-accent-ink); }
+.tabbar__fab {
+  inline-size: 56px; block-size: 56px;
+  margin: 0 var(--space-2);
+  margin-top: -22px;
+  border-radius: var(--radius-pill);
+  border: 4px solid var(--color-bg);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  display: grid; place-items: center;
+  box-shadow: var(--shadow-accent);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.tabbar__fab svg { width: 26px; height: 26px; }
+.tabbar__fab:active { transform: scale(0.94); }
+
+/* ───────────────────────── Cards and tiles ───────────────────────── */
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+}
+.card--flat { box-shadow: none; }
+/* One line under the calorie ring, when the day's share is not the usual number: a tinted strip
+   rather than another grey caption, because it explains a number the person is about to act on. */
+.share-note {
+  display: flex; align-items: center; gap: var(--space-2);
+  margin-top: var(--space-3); padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  font-size: var(--text-sm); font-weight: var(--weight-medium); line-height: var(--leading-snug);
+}
+.share-note svg { inline-size: 16px; block-size: 16px; flex: none; color: var(--color-accent-strong); }
+/* Surfaces that carry text use accent-strong, not accent: white on #F2561D is only 3.4:1. */
+.card--accent, .stat--accent { background: var(--color-accent-strong); color: var(--color-text-on-accent); box-shadow: var(--shadow-accent); }
+.card--accent :is(.eyebrow, .muted, .stat__unit, .stat__foot),
+.stat--accent :is(.eyebrow, .muted, .stat__unit, .stat__foot) { color: rgba(255, 255, 255, 0.9); }
+.card--dark, .stat--dark { background: var(--color-text); color: var(--color-bg); }
+.card--dark :is(.eyebrow, .muted, .stat__unit, .stat__foot),
+.stat--dark :is(.eyebrow, .muted, .stat__unit, .stat__foot) { color: color-mix(in srgb, var(--color-bg) 75%, transparent); }
+.stat__icon--on-accent { background: rgba(255, 255, 255, 0.2); color: var(--color-text-on-accent); }
+.card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.card__title { font-size: var(--text-lg); font-weight: var(--weight-bold); line-height: var(--leading-snug); }
+.card__sub { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.tile-grid > .span-2 { grid-column: span 2; }
+.tile-grid > .tall { grid-row: span 2; }
+
+/* ───────────────────────── Stat tile ───────────────────────── */
+
+.stat {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-md);
+  display: flex; flex-direction: column; gap: var(--space-1);
+  min-width: 0;
+}
+.stat__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.stat__icon {
+  inline-size: 32px; block-size: 32px; border-radius: var(--radius-sm);
+  display: grid; place-items: center;
+  background: var(--color-surface-2); color: var(--color-text);
+}
+.stat__icon svg { width: 18px; height: 18px; }
+.stat__icon--accent { background: var(--color-accent-soft); color: var(--color-accent-ink); }
+.stat__icon--info { background: var(--color-info-soft); color: var(--color-info); }
+.stat__icon--under { background: var(--color-under-soft); color: var(--color-under-ink); }
+.stat__value {
+  margin-top: var(--space-2);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-number);
+}
+.stat__value--hero { font-size: var(--text-4xl); }
+.stat__unit { font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--color-text-muted); letter-spacing: 0; margin-left: 2px; }
+.stat__foot { font-size: var(--text-sm); color: var(--color-text-muted); }
+.stat.stat--accent { background: var(--color-accent-strong); }
+.stat.stat--dark { background: var(--color-text); }
+
+/* Delta: ↑/↓ change. --good / --bad set colour by meaning, not direction. */
+.delta {
+  display: inline-flex; align-items: center; gap: 2px;
+  font-size: var(--text-sm); font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.delta--good { background: var(--color-under-soft); color: var(--color-under-ink); }
+.delta--bad { background: var(--color-over-soft); color: var(--color-over-ink); }
+
+/* ───────────────────────── Progress ring ─────────────────────────
+   <svg class="ring" viewBox="0 0 120 120" style="--p: 69">
+     <circle class="ring__track" cx="60" cy="60" r="52"/>
+     <circle class="ring__fill"  cx="60" cy="60" r="52" pathLength="100"/>
+   </svg>  --p is 0–100. Add .ring--over past 100. */
+
+.ring-wrap { position: relative; display: grid; place-items: center; }
+.ring-wrap > .ring__label { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.ring { width: 100%; height: auto; transform: rotate(-90deg); display: block; }
+.ring circle { fill: none; stroke-width: 12; }
+.ring--thin circle { stroke-width: 8; }
+.ring__track { stroke: var(--color-surface-2); }
+.ring__fill {
+  stroke: var(--color-accent);
+  stroke-linecap: round;
+  stroke-dasharray: min(var(--p, 0), 100) 100;
+  transition: stroke-dasharray var(--duration-slow) var(--ease-out);
+}
+.ring--over .ring__fill { stroke: var(--color-over); }
+.ring--under .ring__fill { stroke: var(--color-under); }
+.ring--info .ring__fill { stroke: var(--color-info); }
+.card--accent .ring__track { stroke: rgba(255, 255, 255, 0.25); }
+.card--accent .ring__fill { stroke: #FFFFFF; }
+
+/* Linear meter (macros, goals) */
+.meter { height: 10px; border-radius: var(--radius-pill); background: var(--color-surface-2); overflow: hidden; }
+.meter > span {
+  display: block; height: 100%; width: calc(min(var(--p, 0), 100) * 1%);
+  border-radius: inherit; background: var(--color-accent);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+.meter--under > span { background: var(--color-under); }
+.meter--over > span { background: var(--color-over); }
+.meter--info > span { background: var(--color-info); }
+.meter--neutral > span { background: var(--color-text); }
+
+/* ───────────────────────── Week bar chart ─────────────────────────
+   Chunky rounded bars for Mon–Sun. Each .wbar sets --h (0–100, bar height
+   as % of the plot) and .week sets --line (allowance line, same scale). */
+
+.week {
+  --plot-h: 132px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+  position: relative;
+}
+.week__plot {
+  position: relative;
+  height: var(--plot-h);
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: end;
+}
+.week__line {
+  position: absolute; inset-inline: 0;
+  bottom: calc(var(--line, 80) * 1%);
+  border-top: 2px dashed var(--color-chart-neutral);
+  pointer-events: none;
+}
+.week__line::after {
+  content: attr(data-label);
+  position: absolute; right: 0; top: -22px;
+  font-size: var(--text-xs); font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  padding: 0 var(--space-1);
+}
+.wbar {
+  height: calc(max(var(--h, 0), 6) * 1%);
+  border-radius: var(--radius-sm);
+  background: var(--color-under);
+  justify-self: center;
+  width: min(100%, 34px);
+  transition: height var(--duration-slow) var(--ease-out);
+}
+.wbar--over { background: var(--color-over); }
+.wbar--today { /* in-progress day: status colour with stripes */
+  background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.38) 0 5px, transparent 5px 10px);
+}
+.wbar--future { background: var(--color-surface-2); height: calc(var(--line, 80) * 1%); }
+.week__day {
+  text-align: center;
+  font-size: var(--text-xs); font-weight: var(--weight-bold);
+  color: var(--color-text-muted);
+  padding-top: var(--space-2);
+}
+.week__day[aria-current="date"] { color: var(--color-accent-ink); }
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin-top: var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted); }
+.legend__key { display: inline-flex; align-items: center; gap: 6px; }
+.legend__key::before { content: ""; inline-size: 10px; block-size: 10px; border-radius: 3px; background: var(--key, var(--color-text)); }
+.legend__key--line::before { block-size: 0; border-top: 2px dashed var(--key, var(--color-chart-neutral)); border-radius: 0; inline-size: 14px; background: none; }
+/* For marks drawn as an outline rather than a fill, so a key never promises a solid block the
+   chart does not contain. */
+.legend__key--ghost::before { background: none; border: 1.5px solid var(--key, var(--color-chart-neutral)); }
+
+/* ───────────────────────── Line chart and sparkline ─────────────────────────
+   Inline SVG with a viewBox; draw paths with these classes. Set
+   preserveAspectRatio="none" and vector-effect so strokes stay crisp. */
+
+.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.chart--spark { height: 40px; }
+.chart path, .chart line, .chart polyline { vector-effect: non-scaling-stroke; }
+.chart__grid { stroke: var(--color-chart-grid); stroke-width: 1; }
+.chart__line { fill: none; stroke: var(--color-accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.chart__line--info { stroke: var(--color-info); }
+.chart__line--text { stroke: var(--color-text); }
+.chart__line--target { stroke: var(--color-text-muted); stroke-width: 1.5; stroke-dasharray: 5 5; }
+.chart__area { fill: var(--color-accent); opacity: 0.12; }
+.chart__area--info { fill: var(--color-info); }
+.chart__dot { fill: var(--color-surface); stroke: var(--color-accent); stroke-width: 2.5; }
+.chart__bar--under { fill: var(--color-under); }
+.chart__bar--over { fill: var(--color-over); }
+.chart__bar--info { fill: var(--color-info); }
+.chart__bar--muted { fill: var(--color-chart-neutral); }
+/* A session logged without a length: outlined rather than filled, because a solid grey block
+   already means "below target" on the sleep chart and this is missing data, not a shortfall. */
+.chart__bar--ghost { fill: none; stroke: var(--color-text-muted); stroke-width: 1.5; }
+.chart__tick { font-size: 11px; fill: var(--color-text-muted); font-family: var(--font-sans); }
+.chart-axis { display: flex; justify-content: space-between; margin-top: var(--space-2); font-size: var(--text-xs); color: var(--color-text-muted); font-weight: var(--weight-semibold); }
+
+/* ───────────────────────── Chips and segmented control ───────────────────────── */
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chip {
+  min-height: 36px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--text-sm); font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  cursor: pointer;
+  position: relative;
+}
+/* Extend the hit area to 44px without making the chip look bigger */
+.chip::after { content: ""; position: absolute; inset: -4px 0; }
+.chip[aria-pressed="true"] { background: var(--color-text); color: var(--color-bg); border-color: var(--color-text); }
+.chip--accent { background: var(--color-accent-soft); color: var(--color-accent-ink); border-color: transparent; }
+.chip--under { background: var(--color-under-soft); color: var(--color-under-ink); border-color: transparent; }
+.chip--over { background: var(--color-over-soft); color: var(--color-over-ink); border-color: transparent; }
+
+.segmented {
+  display: grid; grid-auto-columns: 1fr; grid-auto-flow: column;
+  padding: 4px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+.segmented button {
+  min-height: 36px;
+  border: 0; background: none; cursor: pointer;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm); font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  transition: background var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-out);
+}
+.segmented button[aria-pressed="true"] { background: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-sm); }
+
+/* ───────────────────────── Buttons ───────────────────────── */
+
+.btn {
+  min-height: var(--touch-target);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  border: 0;
+  font-size: var(--text-md); font-weight: var(--weight-bold);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform var(--duration-fast) var(--ease-out), background var(--duration-base) var(--ease-out);
+}
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+.btn--primary { background: var(--color-accent-strong); color: var(--color-text-on-accent); box-shadow: var(--shadow-accent); }
+.btn--primary:hover { background: var(--color-accent-pressed); }
+.btn--secondary { background: var(--color-surface-2); color: var(--color-text); }
+.btn--secondary:hover { background: var(--color-surface-3); }
+.btn--ghost { background: none; color: var(--color-accent-ink); padding: 0 var(--space-3); }
+.btn--danger { background: var(--color-over-soft); color: var(--color-over-ink); }
+.btn--block { width: 100%; }
+.btn--lg { min-height: 56px; font-size: var(--text-lg); border-radius: var(--radius-lg); }
+.btn--icon { inline-size: var(--touch-target); padding: 0; border-radius: var(--radius-pill); }
+
+/* ───────────────────────── Inputs ───────────────────────── */
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field + .field { margin-top: var(--space-3); }
+.label { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.hint { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+/* A filled box with no edge reads as something already decided rather than something to fill in,
+   and it is exactly how a disabled control looks. Every field carries a hairline at rest, firms
+   up under the pointer, and on focus takes a two-pixel accent ring drawn as a shadow so nothing
+   shifts by a pixel when you tab into it. */
+.input, .textarea, .select {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  transition: border-color var(--duration-base) var(--ease-out), background var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+}
+.input, .select { height: var(--field-height); }
+.input::placeholder, .textarea::placeholder { color: var(--color-text-muted); }
+@media (hover: hover) {
+  .input:hover, .textarea:hover, .select:hover { border-color: var(--color-border-strong); }
+}
+.input:focus, .textarea:focus, .select:focus {
+  outline: none;
+  border-color: var(--color-accent-strong);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-accent-strong);
+}
+.input[aria-invalid="true"], .textarea[aria-invalid="true"], .select[aria-invalid="true"] { border-color: var(--color-over); }
+.input[aria-invalid="true"]:focus, .textarea[aria-invalid="true"]:focus { box-shadow: 0 0 0 1px var(--color-over); }
+.input:disabled, .textarea:disabled, .select:disabled { opacity: 0.55; cursor: not-allowed; }
+.input[readonly] { color: var(--color-text-muted); }
+.textarea { min-height: 112px; resize: vertical; line-height: var(--leading-normal); }
+.input-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+
+/* The browser's number spinners are two 10px arrows on a screen designed for thumbs, and they
+   make a number field look different from every other field on the page. */
+.input[type="number"] { -moz-appearance: textfield; }
+.input[type="number"]::-webkit-outer-spin-button,
+.input[type="number"]::-webkit-inner-spin-button { appearance: none; margin: 0; }
+
+/* A menu should not look like a box you can type in. Same frame, own mark. */
+.select {
+  appearance: none;
+  padding-inline-end: calc(var(--space-4) + 22px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2362626C' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5 12 15.5 18 9.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-4) center;
+  background-size: 16px 16px;
+  cursor: pointer;
+}
+[dir="rtl"] .select { background-position: left var(--space-4) center; }
+
+/* The unit belongs beside the number, not in the label. "Weekend (kcal more)" wrapped onto two
+   lines and repeated the unit four times down one card; "Weekend" with a "+ kcal" suffix says
+   the same thing where the value is read. The wrapper holds the frame so the suffix sits inside
+   it, and the input inside goes bare. */
+.field__box {
+  display: flex; align-items: center;
+  padding-inline-end: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+  transition: border-color var(--duration-base) var(--ease-out), background var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+}
+@media (hover: hover) { .field__box:hover { border-color: var(--color-border-strong); } }
+.field__box:focus-within {
+  border-color: var(--color-accent-strong);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-accent-strong);
+}
+.field__box .input {
+  flex: 1; min-inline-size: 0;
+  border: 0; background: none; box-shadow: none;
+  padding-inline-end: var(--space-2);
+}
+.field__box .input:focus { box-shadow: none; background: none; }
+.field__unit {
+  flex: none;
+  font-size: var(--text-sm); font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* One frame for the two single-number pickers, so the height slider and the year stepper beside
+   it read as the same kind of control: the value large on top, the way to change it underneath. */
+.picker { display: grid; gap: var(--space-2); }
+.picker__value {
+  font-size: var(--text-2xl); font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-number); line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;
+}
+.picker__row { display: flex; align-items: center; gap: var(--space-2); }
+.picker__row .picker__value { flex: 1; text-align: center; }
+
+/* A range with a knob you can actually see and hit. accent-color alone leaves a 12px native
+   thumb on a screen whose smallest target is 44. */
+.range {
+  inline-size: 100%;
+  appearance: none;
+  background: none;
+  min-block-size: var(--touch-target);
+  cursor: pointer;
+}
+.range:focus { outline: none; }
+.range::-webkit-slider-runnable-track {
+  block-size: 6px; border-radius: var(--radius-pill);
+  background: linear-gradient(to right, var(--color-accent) 0 var(--fill, 0%), var(--color-surface-3) var(--fill, 0%) 100%);
+}
+.range::-moz-range-track {
+  block-size: 6px; border-radius: var(--radius-pill);
+  background: var(--color-surface-3);
+}
+.range::-moz-range-progress { block-size: 6px; border-radius: var(--radius-pill); background: var(--color-accent); }
+.range::-webkit-slider-thumb {
+  appearance: none;
+  inline-size: 28px; block-size: 28px;
+  margin-block-start: -11px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.range::-moz-range-thumb {
+  inline-size: 28px; block-size: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+.range:active::-webkit-slider-thumb { transform: scale(1.1); }
+.range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--color-accent-soft); }
+.range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px var(--color-accent-soft); }
+@media (prefers-reduced-motion: reduce) { .range::-webkit-slider-thumb { transition: none; } }
+
+/* ───────────────────────── List rows ───────────────────────── */
+
+.list { list-style: none; margin: 0; padding: 0; }
+.list-row {
+  display: flex; align-items: center; gap: var(--space-3);
+  min-height: 60px;
+  padding: var(--space-3) 0;
+}
+.list-row + .list-row { border-top: 1px solid var(--color-border); }
+.list-row__lead {
+  inline-size: 44px; block-size: 44px; flex: none;
+  border-radius: var(--radius-md);
+  display: grid; place-items: center;
+  background: var(--color-surface-2);
+  overflow: hidden;
+  font-size: 1.25rem;
+}
+.list-row__lead img { width: 100%; height: 100%; object-fit: cover; }
+.list-row__body { flex: 1; min-width: 0; }
+.list-row__title { font-weight: var(--weight-semibold); line-height: var(--leading-snug); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-row__meta { font-size: var(--text-sm); color: var(--color-text-muted); }
+.list-row__trail { text-align: right; flex: none; font-variant-numeric: tabular-nums; }
+.list-row__trail strong { display: block; font-weight: var(--weight-bold); }
+
+/* ───────────────────────── Tip callout ───────────────────────── */
+
+.tip {
+  display: flex; gap: var(--space-3); align-items: flex-start;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+.tip__icon { flex: none; inline-size: 28px; block-size: 28px; border-radius: var(--radius-pill); display: grid; place-items: center; background: var(--color-accent); color: var(--color-text-on-accent); }
+.tip__icon svg { width: 16px; height: 16px; }
+.tip strong { display: block; margin-bottom: 2px; font-size: var(--text-md); }
+.tip--info { background: var(--color-info-soft); }
+.tip--info .tip__icon { background: var(--color-info); }
+
+/* ───────────────────────── Empty and loading ───────────────────────── */
+
+.empty { text-align: center; padding: var(--space-8) var(--space-4); }
+.empty__art {
+  inline-size: 64px; block-size: 64px; margin: 0 auto var(--space-3);
+  border-radius: var(--radius-pill);
+  display: grid; place-items: center;
+  background: var(--color-surface-2); color: var(--color-text-muted);
+}
+.empty__art svg { width: 28px; height: 28px; }
+.empty__title { font-weight: var(--weight-bold); font-size: var(--text-lg); }
+.empty__text { color: var(--color-text-muted); font-size: var(--text-sm); margin: var(--space-1) auto var(--space-4); max-width: 30ch; }
+
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--color-surface-2) 0%, var(--color-surface-3) 50%, var(--color-surface-2) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s var(--ease-in-out) infinite;
+  min-height: 14px;
+}
+@keyframes skeleton-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+.spinner {
+  inline-size: 20px; block-size: 20px;
+  border-radius: var(--radius-pill);
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton, .spinner { animation-duration: 3s; }
+}
+
+/* ── Morning check-in ──────────────────────────────────────────────────────
+   A dark prompt card at the top of Today, asking one question at a time.
+   It appears only for today, only while something is unanswered, and folds
+   away once the last answer lands. Dark on the off-white background makes it
+   read as a moment rather than a form, and it is gone for the rest of the day. */
+.checkin {
+  position: relative; overflow: hidden;
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--color-text);
+  color: var(--color-bg);
+  box-shadow: var(--shadow-lg);
+}
+/* Decoration only: a soft accent glow behind the question. */
+.checkin::after {
+  content: ""; position: absolute; inset-block-start: -45%; inset-inline-end: -25%;
+  inline-size: 65%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--color-accent); opacity: 0.18; filter: blur(36px); pointer-events: none;
+}
+.checkin > * { position: relative; }
+.checkin__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+/* A quiet title, deliberately not an uppercase tracked eyebrow: the question is the hero here,
+   and this only says which moment of the day you are in. */
+.checkin__title {
+  font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: color-mix(in srgb, var(--color-bg) 72%, transparent);
+}
+.checkin__progress { display: flex; gap: var(--space-1); }
+.checkin__progress i {
+  inline-size: 16px; block-size: 4px; border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-bg) 25%, transparent);
+  transition: background var(--duration-base) var(--ease-out);
+}
+.checkin__progress i.is-done { background: var(--color-accent); }
+.checkin__question {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--text-xl); font-weight: var(--weight-bold); line-height: var(--leading-snug);
+}
+.checkin__ends {
+  display: flex; justify-content: space-between; margin-bottom: var(--space-3);
+  font-size: var(--text-xs); color: color-mix(in srgb, var(--color-bg) 65%, transparent);
+}
+.checkin__scale { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--space-2); }
+.checkin__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.checkin :is(.checkin__scale, .checkin__chips) button {
+  min-block-size: 52px; padding-inline: var(--space-4);
+  border: 0; cursor: pointer; border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-bg) 12%, transparent);
+  color: var(--color-bg);
+  font-size: var(--text-lg); font-weight: var(--weight-semibold); font-variant-numeric: tabular-nums;
+  transition: background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+.checkin__chips button { min-block-size: 44px; font-size: var(--text-md); }
+.checkin :is(.checkin__scale, .checkin__chips) button:hover { background: color-mix(in srgb, var(--color-bg) 22%, transparent); }
+.checkin :is(.checkin__scale, .checkin__chips) button:active { transform: scale(0.96); }
+.checkin :is(.checkin__scale, .checkin__chips) button[aria-pressed="true"] {
+  background: var(--color-accent-strong); color: var(--color-text-on-accent);
+}
+.checkin__input {
+  inline-size: 100%; min-block-size: 52px; padding: 0 var(--space-4);
+  border: 0; border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-bg) 12%, transparent);
+  color: var(--color-bg);
+  font: inherit; font-size: var(--text-lg); font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+/* Placeholders carry real instruction here, so they meet the same contrast as body text. */
+.checkin__input::placeholder { color: color-mix(in srgb, var(--color-bg) 62%, transparent); }
+/* The one committing action on a step (saving a typed value) carries the accent, so it never
+   looks like just another option. */
+.checkin__go {
+  inline-size: 100%; min-block-size: 52px; margin-top: var(--space-3);
+  border: 0; cursor: pointer; border-radius: var(--radius-md);
+  background: var(--color-accent-strong); color: var(--color-text-on-accent);
+  font: inherit; font-size: var(--text-md); font-weight: var(--weight-semibold);
+  transition: background var(--duration-base) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+.checkin__go:hover { background: var(--color-accent-pressed); }
+.checkin__go:active { transform: scale(0.98); }
+
+.checkin__foot { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-4); }
+.checkin__link {
+  min-block-size: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+  font-size: var(--text-sm); font-weight: var(--weight-semibold);
+  color: color-mix(in srgb, var(--color-bg) 70%, transparent);
+  transition: color var(--duration-base) var(--ease-out);
+}
+.checkin__link:hover { color: var(--color-bg); }
+.checkin__error {
+  margin-top: var(--space-3); font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: color-mix(in srgb, var(--color-bg) 88%, var(--color-over));
+}
+.checkin__done { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-lg); font-weight: var(--weight-semibold); }
+.checkin__done svg { inline-size: 24px; block-size: 24px; color: var(--color-accent); }
+/* Each question arrives rather than snapping into place. */
+.checkin__step { animation: checkin-in var(--duration-base) var(--ease-out) both; }
+@keyframes checkin-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+/* And the card folds away when there is nothing left to ask. */
+.checkin--leaving { animation: checkin-out var(--duration-slow) var(--ease-in-out) forwards; }
+@keyframes checkin-out {
+  0% { opacity: 1; max-block-size: 420px; }
+  55% { opacity: 0; max-block-size: 420px; }
+  100% { opacity: 0; max-block-size: 0; padding-block: 0; margin-bottom: 0; }
+}
+
+/* ── Feel dots ────────────────────────────────────────────────────────────
+   A 1-5 answer as five dots filled up to the value, each step warmer than the last
+   so the row reads as a small heat scale. The ramp is magnitude, not verdict: it
+   never turns red to mark a bad mood, and soreness runs the other way in any case. */
+.dots { display: flex; align-items: center; gap: 4px; }
+.dots i {
+  inline-size: 9px; block-size: 9px; border-radius: 50%;
+  background: var(--color-surface-2);
+  transition: background var(--duration-base) var(--ease-out);
+}
+/* One hue, rising in strength. Mixing two hues across the scale muddies the middle
+   (green into orange lands on olive); an intensity ramp stays clean at every step. */
+.dots i.is-on:nth-child(1) { background: color-mix(in srgb, var(--color-accent) 28%, var(--color-surface-2)); }
+.dots i.is-on:nth-child(2) { background: color-mix(in srgb, var(--color-accent) 46%, var(--color-surface-2)); }
+.dots i.is-on:nth-child(3) { background: color-mix(in srgb, var(--color-accent) 64%, var(--color-surface-2)); }
+.dots i.is-on:nth-child(4) { background: color-mix(in srgb, var(--color-accent) 82%, var(--color-surface-2)); }
+.dots i.is-on:nth-child(5) { background: var(--color-accent); }
+/* The answer itself sits a shade larger, so the row has a point to land on. */
+.dots i.is-last { inline-size: 12px; block-size: 12px; }
+
+.feel-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-2); }
+.feel-row__name { display: flex; align-items: center; gap: var(--space-2); font-weight: var(--weight-semibold); }
+.feel-row__name svg { inline-size: 18px; block-size: 18px; color: var(--color-text-muted); }
+.feel-row__read { display: flex; align-items: center; gap: var(--space-3); }
+
+/* ── Readiness ────────────────────────────────────────────────────────────
+   The day's verdict, given the same dark treatment as the morning check-in: the
+   two are a pair — one asks how you feel, the other answers how you are. The
+   score is the hero, and the five factors sit under it as thin graded tracks
+   rather than five meters competing with the dial, which is what made the light
+   version read as a dashboard instead of an answer. The grading is the same
+   single-hue ramp as the feel dots: strength, never a verdict colour. */
+.readiness { position: relative; overflow: hidden; box-shadow: var(--shadow-lg); }
+/* Decoration only: a glow under the dial, mirroring the check-in's so the two
+   cards read as the same object seen at two moments of the day. */
+.readiness::after {
+  content: ""; position: absolute; inset-block-end: -55%; inset-inline-start: -25%;
+  inline-size: 72%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--color-accent); opacity: 0.16; filter: blur(44px); pointer-events: none;
+}
+.readiness > * { position: relative; }
+.readiness__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.readiness__title {
+  font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: var(--color-on-dark-muted);
+}
+.readiness__band {
+  padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill);
+  background: var(--color-accent-strong); color: var(--color-text-on-accent);
+  font-size: var(--text-xs); font-weight: var(--weight-bold); letter-spacing: 0.02em;
+}
+.readiness__hero { display: flex; align-items: center; gap: var(--space-5); margin-top: var(--space-4); }
+.readiness__dial { inline-size: 104px; flex: none; }
+.readiness__score {
+  font-size: var(--text-3xl); font-weight: var(--weight-black); line-height: var(--leading-tight);
+  letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+}
+.readiness__note { font-size: var(--text-md); line-height: var(--leading-snug); font-weight: var(--weight-medium); }
+.readiness__foot {
+  margin-top: var(--space-4); font-size: var(--text-sm);
+  color: var(--color-on-dark-muted);
+}
+/* The dial on the dark card: a hairline track, and the accent reading as light on it. */
+.ring--on-dark .ring__track { stroke: color-mix(in srgb, var(--color-bg) 16%, transparent); }
+.ring--on-dark .ring__fill { stroke: var(--color-accent); }
+
+.readiness__factors { margin-top: var(--space-5); display: grid; gap: var(--space-4); }
+.factor__row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); font-size: var(--text-sm); }
+.factor__label { font-weight: var(--weight-semibold); }
+.factor__detail {
+  text-align: end; font-variant-numeric: tabular-nums;
+  color: var(--color-on-dark-muted);
+}
+.factor__track {
+  margin-top: var(--space-2); block-size: 4px; border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-bg) 14%, transparent); overflow: hidden;
+}
+.factor__track > span {
+  display: block; block-size: 100%; border-radius: inherit;
+  inline-size: calc(var(--p, 0) * 1%);
+  background: var(--color-accent);
+  transition: inline-size var(--duration-slow) var(--ease-out);
+}
+/* Weaker factors sit further back into the card rather than turning a warning colour:
+   a low HRV day is information, not an alarm. */
+.factor--1 .factor__track > span { background: color-mix(in srgb, var(--color-accent) 50%, var(--color-text)); }
+.factor--2 .factor__track > span { background: color-mix(in srgb, var(--color-accent) 68%, var(--color-text)); }
+.factor--3 .factor__track > span { background: color-mix(in srgb, var(--color-accent) 84%, var(--color-text)); }
+@media (prefers-reduced-motion: reduce) { .factor__track > span { transition: none; } }
+
+
+/* ───────────────────────── Setup flow ─────────────────────────
+   The first run: one question a screen, over the whole viewport, so nothing else competes for
+   attention. The question is the only large type; the answer is the only thing to touch. The
+   sheet is a column with the step in the middle, so a one-line answer and a four-tile answer
+   both sit in the same place rather than jumping up and down the screen between steps. */
+
+.setup {
+  position: fixed; inset: 0; z-index: 60;
+  background: var(--color-bg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.setup__sheet {
+  box-sizing: border-box;
+  min-block-size: 100%;
+  max-inline-size: 480px;
+  margin-inline: auto;
+  padding: calc(var(--space-4) + env(safe-area-inset-top)) var(--gutter) calc(var(--space-5) + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-5);
+}
+.setup__head { display: flex; align-items: center; gap: var(--space-3); }
+.setup__icon, .setup__logo {
+  display: grid; place-items: center; flex: none;
+  inline-size: var(--touch-target); block-size: var(--touch-target);
+  border: 0; border-radius: var(--radius-pill);
+  background: var(--color-surface-2); color: var(--color-text);
+  cursor: pointer;
+}
+.setup__logo { background: var(--color-accent-soft); color: var(--color-accent-ink); cursor: default; }
+.setup__icon svg, .setup__logo svg { inline-size: 20px; block-size: 20px; }
+/* How far through, and nothing more: a count of steps invites counting the steps. */
+.setup__bar {
+  flex: 1; block-size: 6px; border-radius: var(--radius-pill);
+  background: var(--color-surface-2); overflow: hidden;
+}
+.setup__bar > span {
+  display: block; block-size: 100%; inline-size: var(--p, 0%);
+  border-radius: inherit; background: var(--color-accent);
+  transition: inline-size var(--duration-slow) var(--ease-out);
+}
+.setup__later {
+  border: 0; background: none; padding: 0 var(--space-2); min-block-size: var(--touch-target);
+  color: var(--color-text-muted); font: inherit; font-size: var(--text-sm);
+  font-weight: var(--weight-semibold); cursor: pointer;
+}
+.setup__later:hover { color: var(--color-text); }
+
+.setup__step {
+  align-self: center;
+  display: grid; gap: var(--space-4); justify-items: stretch;
+  animation: setup-in var(--duration-base) var(--ease-out) both;
+}
+@keyframes setup-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .setup__step { animation: none; } }
+.setup__title {
+  margin: 0;
+  font-size: var(--text-2xl); font-weight: var(--weight-black); line-height: var(--leading-tight);
+}
+.setup__title:focus-visible { outline: none; }
+.setup__hint { margin: calc(var(--space-3) * -1) 0 0; font-size: var(--text-sm); color: var(--color-text-muted); }
+.setup__live { margin: 0; font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--color-text-muted); min-block-size: 1.2em; }
+.setup__fine { margin: 0; font-size: var(--text-xs); color: var(--color-text-muted); }
+
+/* The typed answer is the biggest thing on the screen, with no box around it to aim at. */
+.setup__input {
+  inline-size: 100%; box-sizing: border-box;
+  border: 0; border-bottom: 2px solid var(--color-border); border-radius: 0;
+  background: none; padding: var(--space-2) 0;
+  color: var(--color-text); font-family: inherit;
+  font-size: var(--text-3xl); font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-number); text-align: center;
+}
+.setup__input:focus { outline: none; border-bottom-color: var(--color-accent); }
+.setup__input::placeholder { color: var(--color-text-muted); font-weight: var(--weight-semibold); }
+.setup__input::-webkit-outer-spin-button, .setup__input::-webkit-inner-spin-button { appearance: none; margin: 0; }
+
+.setup__stage { display: grid; place-items: center; }
+.setup__figure { inline-size: 100%; max-inline-size: 190px; block-size: auto; overflow: visible; }
+
+.setup__choices { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--space-3); }
+.setup__choice {
+  min-block-size: 64px;
+  border: 2px solid transparent; border-radius: var(--radius-lg);
+  background: var(--color-surface-2); color: var(--color-text);
+  font: inherit; font-size: var(--text-lg); font-weight: var(--weight-bold); cursor: pointer;
+  transition: border-color var(--duration-base) var(--ease-out), background var(--duration-base) var(--ease-out);
+}
+.setup__choice[aria-pressed="true"] { border-color: var(--color-accent); background: var(--color-accent-soft); color: var(--color-accent-ink); }
+.setup__tiles { display: grid; gap: var(--space-2); }
+
+.setup__number {
+  margin: 0; display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap;
+  font-size: var(--text-4xl); font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-number); line-height: var(--leading-tight);
+  color: var(--color-accent-ink);
+}
+.setup__facts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);
+  padding: var(--space-4); border-radius: var(--radius-lg); background: var(--color-surface-2);
+}
+.setup__facts .stat__value { margin: 0; }
+.setup__foot { display: grid; gap: var(--space-2); }
+.setup__error { margin: 0; font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--color-over-ink); }
+
+/* ──────────────── Grouped fields inside a card ────────────────
+   A card holds one subject, and a group is a part of it that needs naming — the week's shape
+   inside the calorie settings, the Shortcut's keys inside Apple Watch. The hairline and the
+   heading are what a second card used to do, without a second card's title, padding and Save.
+   Cards are never nested; this is the flat alternative. */
+
+.field-group {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+.field-group__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+/* A hint directly under the group heading explains the group; one under a field explains the
+   field. Either way it sits closer to what it explains than to what comes next. */
+.field-group__title + .hint { margin-top: calc(var(--space-1) * -1); }
+
+/* The quiet action a card ends on: "walk me through it again", never the thing you came to do. */
+.card__foot {
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+.card__foot .btn { margin-inline-start: calc(var(--space-3) * -1); }
+
+/* A file picker that matches every other control on the page. The input stays in the tab order
+   (clipped, not hidden), the label is the button, and the focus ring follows the input onto it
+   so keyboard users see what they are on. The status line below reports what happened, so there
+   is no filename to show: the browser's own "No file chosen" said nothing worth the space. */
+.file-field { margin: var(--space-3) 0 0; }
+.file-field:focus-within .btn { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+/* ──────────────── Meal colour coding (Log) ────────────────
+   One hue per meal time, worn at three strengths so a day's log can be read by colour before any
+   of it is read as words: the whole block takes a wash of its hue, the chip behind the emoji takes
+   the tint, and the heading takes a dot in the solid colour. Nothing else wears these, and nothing
+   wears them at full strength behind text: a tint is a category, a fill is a verdict. */
+
+[data-meal="breakfast"] { --meal: var(--color-meal-breakfast); --meal-soft: var(--color-meal-breakfast-soft); }
+[data-meal="lunch"] { --meal: var(--color-meal-lunch); --meal-soft: var(--color-meal-lunch-soft); }
+[data-meal="dinner"] { --meal: var(--color-meal-dinner); --meal-soft: var(--color-meal-dinner-soft); }
+[data-meal="snack"] { --meal: var(--color-meal-snack); --meal-soft: var(--color-meal-snack-soft); }
+
+/* The block itself. A wash this light keeps every contrast ratio the plain card had, which is the
+   point: the colour says which meal you are looking at, the text still reads as text. The rules
+   between its entries take the same hue, so the block is one object rather than a stack. */
+.card[data-meal] { background: color-mix(in oklab, var(--meal) 11%, var(--color-surface)); }
+.card[data-meal] .list-row + .list-row { border-top-color: color-mix(in oklab, var(--meal) 18%, var(--color-border)); }
+
+.list-row__lead[data-meal] { background: var(--meal-soft); }
+
+/* The dot sits on the baseline of the section title rather than floating beside it. */
+.meal-dot {
+  display: inline-block; flex: none;
+  inline-size: 10px; block-size: 10px;
+  margin-inline-end: var(--space-2);
+  border-radius: 50%;
+  background: var(--meal, var(--color-meal-snack));
+  vertical-align: baseline;
+}
