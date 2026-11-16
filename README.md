@@ -74,8 +74,8 @@ cannot run away from you.
 
 ## Bring your own keys
 
-**There is no API key in this repository, and there never has been.** Nothing here calls a service
-on my behalf, and deploying this does not send anything to me.
+**Your keys stay yours.** Nothing here calls a service on my behalf, and deploying this does not
+send anything to me.
 
 The Claude API key is a Cloudflare secret, set once with `wrangler secret put` and readable only
 by the Worker at runtime. It is never in a file, never in the git history, and never reaches the
